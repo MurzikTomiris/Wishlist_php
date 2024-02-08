@@ -12,8 +12,11 @@ class WishlistController extends Controller
 {
 
     public function create(Request $request){
+        $token = $request->header('token');
+        $account = = Accounts::find($token)
+        $AccountId = $account->AccountId;
         $listLink = Randomizer::generateRandomString(20);
-        $wishlist = Wishlists::create(['name' => $request->name, 'description'=> $request->description, 'listLink'=> $listLink, 'AccountId'=> $request->AccountId, 'IsActive' => true]);
+        $wishlist = Wishlists::create(['name' => $request->name, 'description'=> $request->description, 'listLink'=> $listLink, 'AccountId'=> $AccountId, 'IsActive' => true]);
         
         return $wishlist;
     }

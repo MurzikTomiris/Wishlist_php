@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Accounts;
 use App\Models\Wishlists;
+use App\Helpers\Randomizer;
 
 use Illuminate\Http\Request;
 
@@ -29,7 +30,8 @@ class AccountController extends Controller
             'login' => 'nullable',
             'password'=> 'nullable',
             'name'=> 'nullable',
-            'email' => 'nullable'
+            'email' => 'nullable',
+            'token' => 'nullable'
         ]);
         $account = Accounts::find($id)->update($data);
         return $account;
@@ -39,5 +41,17 @@ class AccountController extends Controller
         $account = Accounts::find($id);
         $account->delete();
         return "Success";
+    }
+
+    public function login(Request $request){
+        $account = Accounts::where("login", "like", $request->login)->first();
+        if($account->password == $request->password){
+            $token = Randomizer::generateRandomString(50);
+            $account->update(['token' => $token]);
+            return response()->json(['token' => $token], 200);
+        }
+        else{
+            throw new \Exception("Неверный логин или пароль");
+        }
     }
 }

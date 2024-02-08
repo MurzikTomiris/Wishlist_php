@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Accounts extends Model
 {
-    protected $fillable = ['login', 'password', 'name', 'email'];  
+    protected $fillable = ['login', 'password', 'name', 'email', 'token'];  
     use HasFactory;
 
     public function wishlists(){
