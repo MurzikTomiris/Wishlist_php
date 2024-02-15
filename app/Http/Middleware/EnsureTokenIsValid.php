@@ -22,7 +22,7 @@ class EnsureTokenIsValid
             //если нашли то записываем в арибуты  request
 
         $request->bearerToken();
-
+        $token = $request->header('token');
         if ($token) {
         $user = Accounts::where('token', $token)->first();
         $request->token = $token;

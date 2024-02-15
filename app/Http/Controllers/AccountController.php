@@ -15,7 +15,7 @@ class AccountController extends Controller
     }
 
     public function item($id){
-        $account = Accounts::with(['wishlists'])->find($id);
+        $account = Accounts::with(['wishlists'])->findOrFail($id);
         return $account;
     }
 
@@ -44,7 +44,7 @@ class AccountController extends Controller
     }
 
     public function login(Request $request){
-        $account = Accounts::where("login", "like", $request->login)->first();
+        $account = Accounts::where("login", "like", $request->login)->firstOrFail();
         if($account->password == $request->password){
             $token = Randomizer::generateRandomString(50);
             $account->update(['token' => $token]);
