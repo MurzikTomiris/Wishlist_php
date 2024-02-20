@@ -33,7 +33,8 @@ class AccountController extends Controller
             'email' => 'nullable',
             'token' => 'nullable'
         ]);
-        $account = Accounts::find($id)->update($data);
+        $account = Accounts::find($id);
+        $account->update($data);
         return $account;
     }
 

@@ -22,7 +22,7 @@ class GiftCardsController extends Controller
     }
 
     public function item($id){
-        $giftCard = GiftCards::with(['wishlist'])->find($id);
+        $giftCard = GiftCards::with(['wishlist'])->findOrFail($id);
         return $giftCard;
     }
 

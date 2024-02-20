@@ -11,7 +11,7 @@ class WishlistTest extends TestCase
    
     public function test_create_wishlist()
     {
-        $account = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '123'])->getContent();
+        $account = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '500'])->getContent();
         $obj=json_decode($account);
         $token = $obj->token;
         $response = $this->withHeaders([

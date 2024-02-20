@@ -24,7 +24,7 @@ class WishlistController extends Controller
     }
 
     public function item($id){
-        $wishlist = Wishlists::with(['giftCards'])->find($id);
+        $wishlist = Wishlists::with(['giftCards'])->findOrFail($id);
         return $wishlist;
     }
 
