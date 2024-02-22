@@ -54,5 +54,22 @@ class GiftCardsTest extends TestCase
         $response->assertJsonIsObject();     
     }
 
+    public function test_upd_giftCard_wrong_id(){
+        $response = $this->putJson('/giftcard/100000000', ['description' => 'white']);
+        $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
+    }
+
+    public function test_create_GiftCard()
+    {
+        $giftCard = GiftCards::factory()->create();
+        $this->assertModelExists($giftCard);
+    }
+
+    public function test_create_GiftCard_wrong_id()
+    {
+        $response = $this->postJson('/api/giftcard', ['title' => 'IPhine', 'description' => '15 pro', 'wishlist_id' => '1000000000']);
+ 
+        $response->assertStatus(500);
+    }
     
 }

@@ -79,5 +79,9 @@ class AccountTest extends TestCase
         $response->assertJsonIsObject();     
     }
 
+    public function test_upd_account_wrong_id(){
+        $response = $this->putJson('/account/1000000', ['password' => '500']);
+        $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
+    }
 
 }

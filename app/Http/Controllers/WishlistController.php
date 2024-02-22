@@ -14,7 +14,7 @@ class WishlistController extends Controller
     public function create(Request $request){
 
         $token = $request->header('token');
-        $account = Accounts::where('token', 'like', $token)->first(); 
+        $account = Accounts::where('token', 'like', $token)->firstOrFail(); 
         //dd($account);
         $AccountId = $account->id;
         $listLink = Randomizer::generateRandomString(20);
