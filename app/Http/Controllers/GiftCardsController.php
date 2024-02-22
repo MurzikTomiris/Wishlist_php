@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 class GiftCardsController extends Controller
 {
     public function create(Request $request){
-        $account = Accounts::where("wishlist_id", "like", $request->wishlist_id)->firstOrFail();
-        if($account != null){
+        $wishlists = Wishlists::where("id", "=", $request->wishlist_id)->firstOrFail();
+        //dd($wishlists);
+        if(!empty($wishlists)){
             $giftCard = GiftCards::create([
             'title' => $request->title, 
             'description'=> $request->description, 
@@ -22,7 +23,7 @@ class GiftCardsController extends Controller
             return $giftCard;
         }
         else{
-            return "Account with {$request->wishlist_id} doesn't exist";
+            return "wishlists with {$request->wishlist_id} doesn't exist";
         }
     }
 

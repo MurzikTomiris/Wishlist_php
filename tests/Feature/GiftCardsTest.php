@@ -69,7 +69,7 @@ class GiftCardsTest extends TestCase
     {
         $response = $this->postJson('/api/giftcard', ['title' => 'IPhine', 'description' => '15 pro', 'wishlist_id' => '1000000000']);
  
-        $response->assertStatus(500);
+        $response->assertStatus(404);
     }
     
 }
