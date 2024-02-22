@@ -72,4 +72,10 @@ class GiftCardsTest extends TestCase
         $response->assertStatus(404);
     }
     
+    public function test_get_by_id_when_id_is_not_numeric()
+    {
+        $response = $this->get('/api/giftcard/invalid_id');
+
+        $response->assertStatus(500);
+    }
 }

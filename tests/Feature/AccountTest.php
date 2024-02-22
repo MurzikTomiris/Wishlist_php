@@ -84,4 +84,23 @@ class AccountTest extends TestCase
         $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
     }
 
+    public function test_get_account_by_id_when_id_is_not_numeric()
+    {
+        $response = $this->get('/api/account/invalid_id');
+
+        $response->assertStatus(500);
+    }
+
+    public function test_account_has_no_wishlists()
+    {
+        $account = Accounts::factory()->create();
+
+        $response = $this->get("/api/account/{$account->id}");
+
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'id' => $account->id,
+                     'wishlists' => []
+                 ]);
+    }
 }

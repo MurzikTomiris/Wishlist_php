@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Wishlists;
+use App\Models\Accounts;
 
 class WishlistTest extends TestCase
 {
@@ -78,6 +79,13 @@ class WishlistTest extends TestCase
     public function test_upd_wishlist_wrong_id(){
         $response = $this->putJson('/wishlist/100000000', ['description' => 'New year wishlist']);
         $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
+    }
+
+    public function test_get_by_id_when_id_is_not_numeric()
+    {
+        $response = $this->get('/api/wishlist/invalid_id');
+
+        $response->assertStatus(500);
     }
 
     
