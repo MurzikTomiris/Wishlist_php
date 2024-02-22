@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Helpers\Randomizer;
+use App\Models\Wishlists;
 
 
 class GiftCardsFactory extends Factory
@@ -11,10 +12,10 @@ class GiftCardsFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->title(),
-            'description' => Randomizer::generateRandomString(50),
-            'wishlist_id' => fake()->numberBetween(0, 10),
-            'link' => Randomizer::generateRandomString(50),
+            'title' => fake()->word(),
+            'description' => fake()->text(50),
+            'wishlist_id' => Wishlists::all()->random()->id,
+            'link' => fake()->url(),
         ];
     }
 }

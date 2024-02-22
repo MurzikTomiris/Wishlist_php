@@ -56,3 +56,7 @@ class AccountController extends Controller
         }
     }
 }
+
+
+// php artisan make:request
+// созать папку

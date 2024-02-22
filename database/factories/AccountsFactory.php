@@ -14,7 +14,7 @@ class AccountsFactory extends Factory
     public function definition(): array
     {
         return [
-            'login' => fake()->name(),
+            'login' => fake()->word(),
             'password' => Randomizer::generateRandomString(10),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),

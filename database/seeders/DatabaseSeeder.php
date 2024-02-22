@@ -16,9 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        AccountSeeder::run()
-        GiftCardsSeeder::run()
-        WishlistsSeeder::run()
+        //AccountSeeder::run();
+        //GiftCardsSeeder::run();
+        //WishlistsSeeder::run();
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
