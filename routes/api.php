@@ -18,16 +18,16 @@ use App\Http\Controllers\GiftCardsController;
 */
 
 Route::post('/account', [AccountController::class, 'create']);
-Route::get('/account/{id}', [AccountController::class, 'item']);
+Route::get('/account', [AccountController::class, 'item'])->middleware('auth.token');
 Route::get('/accounts', [AccountController::class, 'list']);
-Route::put('/account/{id}', [AccountController::class, 'update']);
-Route::delete('/account/{id}', [AccountController::class, 'delete']);
+Route::put('/account', [AccountController::class, 'update'])->middleware('auth.token');
+Route::delete('/account', [AccountController::class, 'delete'])->middleware('auth.token');
 
 Route::post('/login', [AccountController::class, 'login']);
 
 Route::post('/wishlist', [WishlistController::class, 'create'])->middleware('auth.token');
 Route::get('/wishlist/{id}', [WishlistController::class, 'item']);
-Route::get('/wishlists', [WishlistController::class, 'list']);
+Route::get('/wishlists', [WishlistController::class, 'list'])->middleware('auth.token');
 Route::put('/wishlist/{id}', [WishlistController::class, 'update']);
 Route::put('/disable-wishlist/{id}', [WishlistController::class, 'disable']);
 

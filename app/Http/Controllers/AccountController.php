@@ -3,29 +3,22 @@
 namespace App\Http\Controllers;
 use App\Models\Accounts;
 use App\Models\Wishlists;
+use App\Services\AccountService;
 use App\Helpers\Randomizer;
 
 use Illuminate\Http\Request;
 
 class AccountController extends Controller
 {
+
+    protected $service;
+
+    public function __construct(){
+        $this->service = new AccountService();
+    }
+
     public function create(Request $request){
-        $account = Accounts::create(['login' => $request->login, 'password'=> $request->password, 'name'=> $request->name, 'email'=> $request->email]);
-        return $account;
-    }
-
-    public function item($id){
-        $account = Accounts::with(['wishlists'])->findOrFail($id);
-        return $account;
-    }
-
-    public function list(){
-        $account = Accounts::get();
-        return $account;
-    }
-
-    public function update(Request $request, $id)
-    {
+        
         $data = $request->validate([
             'login' => 'nullable',
             'password'=> 'nullable',
@@ -33,14 +26,41 @@ class AccountController extends Controller
             'email' => 'nullable',
             'token' => 'nullable'
         ]);
-        $account = Accounts::find($id);
-        $account->update($data);
+        $data['token'] = Randomizer::generateRandomString(50);
+        $account = Accounts::create($data);
         return $account;
     }
 
-    public function delete($id){
-        $account = Accounts::find($id);
-        $account->delete();
+    public function item(Request $request){
+        //$account = Accounts::with(['wishlists'])->findOrFail($id);
+        $token = $request->header('token');
+        return $this->service->item($token);
+    }
+
+    public function list(){
+        $account = Accounts::get();
+        return $account;
+    }
+
+    public function update(Request $request)
+    {
+        
+        $token = $request->header('token');
+
+        $data = $request->validate([
+            'login' => 'nullable',
+            'password'=> 'nullable',
+            'name'=> 'nullable',
+            'email' => 'nullable',
+            'token' => 'nullable'
+        ]);
+
+        return $this->service->update($token, $data);
+    }
+
+    public function delete(Request $request){
+        $token = $request->header('token');
+        $this->service->delete($token);
         return "Success";
     }
 

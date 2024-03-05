@@ -28,8 +28,12 @@ class WishlistController extends Controller
         return $wishlist;
     }
 
-    public function list(){
-        $wishlist = Wishlists::get();
+    public function list(Request $request){
+        $token = $request->header('token');
+        $account = Accounts::where('token', 'like', $token)->first();
+        $wishlist = Wishlists::where('AccountId', $account->id)
+                                ->where('IsActive', true)
+                                ->get();
         return $wishlist;
     }
 
