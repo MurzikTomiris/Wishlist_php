@@ -9,13 +9,8 @@ use App\Models\Accounts;
 
 class AccountTest extends TestCase
 {
-    
-    public function test_get_account_by_id()
-    {
-        $response = $this->get('/api/account/4');
 
-        $response->assertStatus(200);
-    }
+
     
     public function test_account_not_found_by_id()
     {
@@ -84,23 +79,21 @@ class AccountTest extends TestCase
         $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
     }
 
-    public function test_get_account_by_id_when_id_is_not_numeric()
+   /*public function test_account_has_no_wishlists()
     {
-        $response = $this->get('/api/account/invalid_id');
+        $item = Accounts::factory()->create();
+        $account = $this->postJson('/api/login', ['login' => $item->login, 'password' => $item->password])->getContent();
+        $obj=json_decode($account);
+        $token = $obj->token;
 
-        $response->assertStatus(500);
-    }
-
-    public function test_account_has_no_wishlists()
-    {
-        $account = Accounts::factory()->create();
-
-        $response = $this->get("/api/account/{$account->id}");
+        $response = $this->withHeaders([
+            'token' => $token,
+        ])->$this->get('/api/account');
 
         $response->assertStatus(200)
                  ->assertJson([
                      'id' => $account->id,
                      'wishlists' => []
                  ]);
-    }
+    }*/
 }

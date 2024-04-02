@@ -5,6 +5,8 @@ use App\Models\Accounts;
 use App\Models\Wishlists;
 use App\Services\AccountService;
 use App\Helpers\Randomizer;
+use App\Http\Requests\AccountRequest;
+
 
 use Illuminate\Http\Request;
 
@@ -17,17 +19,10 @@ class AccountController extends Controller
         $this->service = new AccountService();
     }
 
-    public function create(Request $request){
+    public function create(AccountRequest $request){
         
-        $data = $request->validate([
-            'login' => 'nullable',
-            'password'=> 'nullable',
-            'name'=> 'nullable',
-            'email' => 'nullable',
-            'token' => 'nullable'
-        ]);
-        $data['token'] = Randomizer::generateRandomString(50);
-        $account = Accounts::create($data);
+        $request['token'] = Randomizer::generateRandomString(50);
+        $account = Accounts::create($request->all());
         return $account;
     }
 
@@ -42,18 +37,11 @@ class AccountController extends Controller
         return $account;
     }
 
-    public function update(Request $request)
+    public function update(AccountRequest $request)
     {
-        
         $token = $request->header('token');
 
-        $data = $request->validate([
-            'login' => 'nullable',
-            'password'=> 'nullable',
-            'name'=> 'nullable',
-            'email' => 'nullable',
-            'token' => 'nullable'
-        ]);
+        $data = $request->all();
 
         return $this->service->update($token, $data);
     }

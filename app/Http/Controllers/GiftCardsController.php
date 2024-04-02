@@ -3,60 +3,49 @@
 namespace App\Http\Controllers;
 use App\Models\Wishlists;
 use App\Models\GiftCards;
+use App\Http\Requests\GiftCardRequest;
+use App\Services\GiftCardsService;
+
 
 use Illuminate\Http\Request;
 
 class GiftCardsController extends Controller
 {
-    public function create(Request $request){
-        $wishlists = Wishlists::where("id", "=", $request->wishlist_id)->firstOrFail();
-        //dd($wishlists);
-        if(!empty($wishlists)){
-            $giftCard = GiftCards::create([
-            'title' => $request->title, 
-            'description'=> $request->description, 
-            'price'=> $request->price, 
-            'link'=> $request->link,
-            'image'=> $request->image,
-            'wishlist_id'=> $request->wishlist_id
-            ]);
-            return $giftCard;
-        }
-        else{
-            return "wishlists with {$request->wishlist_id} doesn't exist";
-        }
+    protected $service;
+
+    public function __construct(){
+        $this->service = new GiftCardsService();
+    }
+
+    public function create(GiftCardRequest $request){
+        $giftCard = $this->service->create($request->all());
+        return $giftCard;
     }
 
     public function item($id){
-        $giftCard = GiftCards::with(['wishlist'])->findOrFail($id);
+        $giftCard = $this->service->item($id);
         return $giftCard;
     }
 
     public function list(){
-        $giftCard = GiftCards::get();
+        $giftCard = $this->service->list();
         return $giftCard;
     }
 
-    public function update(Request $request, $id)
-    {
-        $data = $request->validate([
-            'title' => 'nullable',
-            'description' => 'nullable',
-            'price' => 'nullable', 
-            'link' => 'nullable',
-            'image' => 'nullable',
-            'wishlist_id' => 'nullable',
-            'IsReserved'=>'nullable',
-            'IsActive' => 'nullable'
-        ]);
+    public function listById($id){
+        $giftCard = $this->service->listById($id);
+        return $giftCard;
+    }
 
-        $giftCard = GiftCards::find($id)->update($data);
+
+    public function update(GiftCardRequest $request, $id)
+    {
+        $giftCard = $this->service->update($request->all(), $id);
         return $giftCard;
     }
 
     public function disable($id){
-        $giftCard = GiftCards::find($id)->update(['IsActive' => 0]);
+        $giftCard = $this->service->disable($id);
         return "Success";
-    }
-    
+    }  
 }

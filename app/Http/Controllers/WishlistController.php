@@ -6,16 +6,26 @@ use Illuminate\Http\Request;
 use App\Models\Wishlists;
 use App\Models\Accounts;
 use App\Helpers\Randomizer;
+use App\Services\AccountService;
+use App\Services\WishlistService;
+use App\Http\Requests\WishlistRequest;
+
 
 
 class WishlistController extends Controller
 {
+    protected $service;
+    protected $accountService;
+
+    public function __construct(){
+        $this->service = new WishlistService();
+        $this->accountService = new AccountService();
+    }
 
     public function create(Request $request){
 
         $token = $request->header('token');
-        $account = Accounts::where('token', 'like', $token)->first(); 
-        //dd($account);
+        $account = $this->accountService->item($token);
         $AccountId = $account->id;
         $listLink = Randomizer::generateRandomString(20);
         $wishlist = Wishlists::create(['name' => $request->name, 'description'=> $request->description, 'listLink'=> $listLink, 'AccountId'=> $AccountId, 'IsActive' => true]);
@@ -30,22 +40,19 @@ class WishlistController extends Controller
 
     public function list(Request $request){
         $token = $request->header('token');
-        $account = Accounts::where('token', 'like', $token)->first();
-        $wishlist = Wishlists::where('AccountId', $account->id)
-                                ->where('IsActive', true)
-                                ->get();
+        $account = $this->accountService->item($token);
+        $wishlist = $this->service->list($account);
         return $wishlist;
     }
 
-    public function update(Request $request, $id)
+    public function listByLink($listLink){
+        $wishlist = $this->service->getIdByLink($listLink);
+        return $wishlist;
+    }
+
+    public function update(WishlistRequest $request, $id)
     {
-        $data = $request->validate([
-            'name' => 'nullable',
-            'description' => 'nullable',
-            'listLink' => 'nullable',
-            'AccountId'=>'nullable',
-            'IsActive' => 'nullable'
-        ]);
+        $data = $request->all();
         $wishlist = Wishlists::find($id)->update($data);
         return $wishlist;
     }

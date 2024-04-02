@@ -28,12 +28,14 @@ Route::post('/login', [AccountController::class, 'login']);
 Route::post('/wishlist', [WishlistController::class, 'create'])->middleware('auth.token');
 Route::get('/wishlist/{id}', [WishlistController::class, 'item']);
 Route::get('/wishlists', [WishlistController::class, 'list'])->middleware('auth.token');
+Route::get('/wishlist-link/{listLink}', [WishlistController::class, 'listByLink']);
 Route::put('/wishlist/{id}', [WishlistController::class, 'update']);
 Route::put('/disable-wishlist/{id}', [WishlistController::class, 'disable']);
 
 Route::post('/giftcard', [GiftCardsController::class, 'create']);
 Route::get('/giftcard/{id}', [GiftCardsController::class, 'item']);
 Route::get('/giftcards', [GiftCardsController::class, 'list']);
+Route::get('/giftcards/{id}', [GiftCardsController::class, 'listById']);
 Route::put('/giftcard/{id}', [GiftCardsController::class, 'update']);
 Route::put('/disable-giftcard/{id}', [GiftCardsController::class, 'disable']);
 

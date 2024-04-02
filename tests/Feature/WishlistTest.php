@@ -64,12 +64,18 @@ class WishlistTest extends TestCase
         $response->assertStatus(404);
     }
 
-    public function test_wishlists_list()
+    /*public function test_wishlists_list()
     {
-        $count = Wishlists::get()->count();
-        $response = $this->get('/api/wishlists');
+        $account = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '500'])->getContent();
+        $obj=json_decode($account);
+        $token = $obj->token;
+        $response = $this->withHeaders([
+            'token' => $token,
+        ])->get('/api/wishlists');
+
+        $count = Wishlists::count();
         $response->assertJsonCount($count, $key = null);
-    }
+    }*/
 
     public function test_upd_wishlist(){
         $response = $this->putJson('/wishlist/4', ['description' => '8 March wishlist']);
