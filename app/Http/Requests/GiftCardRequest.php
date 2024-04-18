@@ -24,7 +24,7 @@ class GiftCardRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'nullable',
+            'title' => 'nullable|max:100',
             'description'=> 'nullable',
             'link'=> 'nullable',
             'image' => 'nullable',

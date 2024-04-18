@@ -4,45 +4,69 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 use App\Models\Accounts;
+use App\Helpers\Randomizer;
 
 class AccountTest extends TestCase
-{
-
-
-    
+{    
     public function test_account_not_found_by_id()
     {
-        $response = $this->get('/api/account/41000');
+        $latest = Accounts::latest()->first();
+        $id = $latest->id+1;
+        $response = $this->get('/api/account/' . $id);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_get_account_when_id_is_not_numeric()
+    {
+        $response = $this->get('/api/account/invalid_id');
 
         $response->assertStatus(404);
     }
 
     public function test_login()
     {
-        $response = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '500']);
-
+        $login = Randomizer::generateRandomString(10);
+        $existingAccount = Accounts::where("login", $login)->first();
+        while ($existingAccount) {
+            $login = Randomizer::generateRandomString(10);
+            $existingAccount = Accounts::where("login", $login)->first();
+        }
+        $account = Accounts::factory()->create(['login' => $login]);
+        $response = $this->postJson('/api/login', ['login' => $account->login, 'password' => $account->password]);
         $response->assertStatus(200);
+        
     }
 
     public function test_wrong_login()
     {
-        $response = $this->postJson('/api/login', ['login' => 'tom', 'password' => '123']);
-
-        $response->assertJsonFragment(['message' => 'No query results for model [App\\Models\\Accounts].']);
+        $account = Accounts::factory()->make()->toArray();
+        $existingAccount = Accounts::where("login", "like", $account["login"])->first();
+        while ($existingAccount) {
+            $account = Accounts::factory()->make()->toArray();
+            $existingAccount = Accounts::where("login", "like", $account["login"])->first();
+        }
+        $response = $this->postJson('/api/login', $account);
+        $response->assertStatus(404);
     }
 
     public function test_wrong_password()
     {
-        $response = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '1123']);
+        $account = Accounts::where("id", 1)->first();
+        $password = Randomizer::generateRandomString(1);
+        $response = $this->postJson('/api/login', ['login' => $account["login"], 'password' => $password]);
 
         $response->assertJsonFragment(['message' => 'Неверный логин или пароль']);
     }
 
-    public function test_create_account__email_not_unique()
+    public function test_create_account_email_not_unique()
     {
-        $response = $this->postJson('/api/account', ['login' => 'tomi', 'password' => '1234', 'name' => 'hgtvf', 'email' => '1234@hghj.dw']);
+        $mail = DB::select('select email from accounts where id = 1');
+        $email = $mail[0]->email;
+        $response = $this->postJson('/api/account', ['login' => 'tomi', 'password' => '1234', 'name' => 'hgtvf', 'email' => $email]);
 
         $response->assertJsonFragment(['exception' => "Illuminate\\Database\\QueryException"]);
     }
@@ -62,6 +86,26 @@ class AccountTest extends TestCase
 
     }
 
+    public function test_delete_account_with_token()
+    {
+        $account = Accounts::factory()->create();
+        $token = $account->token;
+        $response = $this->withHeaders([
+            'token' => $token,
+        ])->delete('/api/account');
+        
+        $this->assertModelMissing($account);
+    }
+
+    public function test_wrong_delete_account()
+    {
+        $response = $this->withHeaders([
+            'token' => null,
+        ])->delete('/api/account');
+ 
+        $response->assertUnauthorized();
+    }
+
     public function test_account_list()
     {
         $count = Accounts::get()->count();
@@ -70,30 +114,16 @@ class AccountTest extends TestCase
     }
 
     public function test_upd_account(){
-        $response = $this->putJson('/account/34', ['password' => '500']);
+        $latest = Accounts::latest()->first();
+        $response = $this->putJson('/api/account/' . $latest->id, ['password' => '500']);
         $response->assertJsonIsObject();     
     }
 
     public function test_upd_account_wrong_id(){
-        $response = $this->putJson('/account/1000000', ['password' => '500']);
+        $latest = Accounts::latest()->first();
+        $id = $latest->id+1;
+        $response = $this->putJson('/api/account/' . $id, ['password' => '500']);
         $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
     }
-
-   /*public function test_account_has_no_wishlists()
-    {
-        $item = Accounts::factory()->create();
-        $account = $this->postJson('/api/login', ['login' => $item->login, 'password' => $item->password])->getContent();
-        $obj=json_decode($account);
-        $token = $obj->token;
-
-        $response = $this->withHeaders([
-            'token' => $token,
-        ])->$this->get('/api/account');
-
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'id' => $account->id,
-                     'wishlists' => []
-                 ]);
-    }*/
+   
 }

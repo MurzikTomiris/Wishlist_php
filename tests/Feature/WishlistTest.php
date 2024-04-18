@@ -7,13 +7,15 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\Wishlists;
 use App\Models\Accounts;
+use App\Helpers\Randomizer;
 
 class WishlistTest extends TestCase
 {
    
     public function test_create_wishlist()
     {
-        $account = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '500'])->getContent();
+        $accountInfo = Accounts::where("id", 1)->first();
+        $account = $this->postJson('/api/login', ['login' => $accountInfo->login, 'password' => $accountInfo->password])->getContent();
         $obj=json_decode($account);
         $token = $obj->token;
         $response = $this->withHeaders([
@@ -27,6 +29,35 @@ class WishlistTest extends TestCase
             ]);
     }
 
+    public function test_create_wishlist_name_error()
+    {
+        $accountInfo = Accounts::where("id", 1)->first();
+        $account = $this->postJson('/api/login', ['login' => $accountInfo->login, 'password' => $accountInfo->password])->getContent();
+        $obj=json_decode($account);
+        $token = $obj->token;
+        $name = Randomizer::generateRandomString(200);
+        $response = $this->withHeaders([
+            'token' => $token,
+        ])->postJson('/api/wishlist', ['name' => $name, 'description' => 'Birthday wishlist']);
+ 
+        $response->assertStatus(422);
+    }
+
+    public function test_create_wishlist_name_max()
+    {
+        $accountInfo = Accounts::where("id", 1)->first();
+        $account = $this->postJson('/api/login', ['login' => $accountInfo->login, 'password' => $accountInfo->password])->getContent();
+        $obj=json_decode($account);
+        $token = $obj->token;
+        $name = Randomizer::generateRandomString(200);
+        $response = $this->withHeaders([
+            'token' => $token,
+        ])->postJson('/api/wishlist', ['name' => $name, 'description' => 'Birthday wishlist']);
+ 
+        $response->assertJsonFragment(['message' => 'The name must not be greater than 100 characters.']);
+    }
+
+
     public function test_unautorized_create_wishlist()
     {
         $response = $this->withHeaders([
@@ -38,44 +69,20 @@ class WishlistTest extends TestCase
 
     public function test_disable_by_id()
     {
-        $response = $this->put('/api/disable-wishlist/15');
+        $latest = Wishlists::latest()->first();
+        $response = $this->put('/api/disable-wishlist/' . $latest->id);
 
         $response->assertStatus(200);
     }
 
     public function test_wrong_disable_by_id()
     {
-        $response = $this->put('/api/disable-wishlist/10000000');
+        $latest = Wishlists::latest()->first();
+        $id = $latest->id+1;
+        $response = $this->put('/api/disable-wishlist/' . $id);
 
         $response->assertStatus(500);
     }
-
-    public function test_get_GiftCards_by_id()
-    {
-        $response = $this->get('/api/wishlist/1');
-
-        $response->assertStatus(200);
-    }
-    
-    public function test_GiftCards_not_found_by_id()
-    {
-        $response = $this->get('/api/wishlist/10000000');
-
-        $response->assertStatus(404);
-    }
-
-    /*public function test_wishlists_list()
-    {
-        $account = $this->postJson('/api/login', ['login' => 'tom1', 'password' => '500'])->getContent();
-        $obj=json_decode($account);
-        $token = $obj->token;
-        $response = $this->withHeaders([
-            'token' => $token,
-        ])->get('/api/wishlists');
-
-        $count = Wishlists::count();
-        $response->assertJsonCount($count, $key = null);
-    }*/
 
     public function test_upd_wishlist(){
         $response = $this->putJson('/wishlist/4', ['description' => '8 March wishlist']);
@@ -87,6 +94,23 @@ class WishlistTest extends TestCase
         $response->assertJsonFragment(['exception' => "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException"]); 
     }
 
+    public function test_wishlist_get_by_id()
+    {
+        $latest = Wishlists::latest()->first();
+        $response = $this->get('/api/wishlist/' .$latest->id);
+
+        $response->assertStatus(200);
+    }
+
+    public function test_wishlist_not_found_by_id()
+    {
+        $latest = Wishlists::latest()->first();
+        $id = $latest->id+1;
+        $response = $this->get('/api/wishlist/' . $id);
+
+        $response->assertStatus(404);
+    }
+
     public function test_get_by_id_when_id_is_not_numeric()
     {
         $response = $this->get('/api/wishlist/invalid_id');
@@ -94,5 +118,13 @@ class WishlistTest extends TestCase
         $response->assertStatus(500);
     }
 
+    public function test_wishlist_link()
+    {
+        $wishlist = Wishlists::where("id", 1)->first();
+
+        $response = $this->get('/api/wishlist-link/' .$wishlist->listLink);
+
+        $response->assertStatus(200);
+    }
     
 }

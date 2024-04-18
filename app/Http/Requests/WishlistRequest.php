@@ -24,7 +24,7 @@ class WishlistRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable',
+            'name' => 'nullable|max:100',
             'description'=> 'nullable',
             'listLink'=> 'nullable',
             'AccountId' => 'nullable',

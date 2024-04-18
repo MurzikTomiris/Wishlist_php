@@ -24,28 +24,32 @@ class GiftCardsController extends Controller
 
     public function item($id){
         $giftCard = $this->service->item($id);
+
         return $giftCard;
     }
 
     public function list(){
         $giftCard = $this->service->list();
+
         return $giftCard;
     }
 
     public function listById($id){
         $giftCard = $this->service->listById($id);
+
         return $giftCard;
     }
-
 
     public function update(GiftCardRequest $request, $id)
     {
         $giftCard = $this->service->update($request->all(), $id);
+
         return $giftCard;
     }
 
     public function disable($id){
         $giftCard = $this->service->disable($id);
-        return "Success";
+        
+        return true;
     }  
 }

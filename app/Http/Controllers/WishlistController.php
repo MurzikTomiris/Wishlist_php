@@ -22,43 +22,45 @@ class WishlistController extends Controller
         $this->accountService = new AccountService();
     }
 
-    public function create(Request $request){
+    public function create(WishlistRequest $request){
 
         $token = $request->header('token');
         $account = $this->accountService->item($token);
-        $AccountId = $account->id;
-        $listLink = Randomizer::generateRandomString(20);
-        $wishlist = Wishlists::create(['name' => $request->name, 'description'=> $request->description, 'listLink'=> $listLink, 'AccountId'=> $AccountId, 'IsActive' => true]);
+        $wishlist = $this->service->create($request->all(), $account->id);
         
         return $wishlist;
     }
 
     public function item($id){
-        $wishlist = Wishlists::with(['giftCards'])->findOrFail($id);
+        $wishlist = $this->service->item($id);
+
         return $wishlist;
     }
 
     public function list(Request $request){
         $token = $request->header('token');
         $account = $this->accountService->item($token);
-        $wishlist = $this->service->list($account);
+        $wishlist = $this->service->list($account->id);
+
         return $wishlist;
     }
 
     public function listByLink($listLink){
         $wishlist = $this->service->getIdByLink($listLink);
+
         return $wishlist;
     }
 
     public function update(WishlistRequest $request, $id)
     {
-        $data = $request->all();
-        $wishlist = Wishlists::find($id)->update($data);
+        $wishlist = $this->service->update($request->all(), $id);
+
         return $wishlist;
     }
 
     public function disable($id){
-        $wishlist = Wishlists::find($id)->update(['IsActive' => 0]);
-        return "Success";
+        $wishlist = $this->service->disable($id);
+        
+        return true;
     }
 }
